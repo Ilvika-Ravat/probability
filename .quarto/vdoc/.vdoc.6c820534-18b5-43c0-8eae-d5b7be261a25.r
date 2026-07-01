@@ -1,26 +1,26 @@
----
-title: "Probability"
-author: Ilvika
-format: html
-execute:
-  echo: false
----
-
-```{r}
+#
+#
+#
+#
+#
+#
+#
+#
+#
 #| message: false
 library(tidyverse)
-```
-
-```{r}
+#
+#
+#
 #| cache: true
 throw_dice <- function(n = 1, weights = rep(1/6, 6)) {
   d1 <- sample(1:6, n, replace = TRUE, prob = weights)
   d2 <- sample(1:6, n, replace = TRUE, prob = weights)
   d1 + d2
 }
-```
-
-```{r}
+#
+#
+#
 theoretical_pdf <- bind_rows(
   tibble(face = factor(1:6), probability = rep(1/6, 6), die = "Fair"),
   tibble(face = factor(1:6), probability = c(0.30, rep(0.14, 5)), die = "Loaded")
@@ -34,38 +34,23 @@ theoretical_pdf %>%
   labs(x = "Face", y = "Probability", title = "Theoretical PDFs: Fair vs. Loaded Die") +
   theme_minimal() +
   theme(legend.position = "none")
-```
-
-```{r}
+#
+#
+#
 #| cache: true
 log_lr <- function(rolls) {
   p_loaded <- ifelse(rolls == 6, 0.30, 0.14)
   p_fair <- 1/6
   log(p_loaded / p_fair)
 }
-```
-
-```{r}
+#
+#
+#
 set.seed(10)
-weights <- c(0.14, 0.14, 0.14, 0.14, 0.14, 0.30)
-reps <- 1000
-max_rolls <- 2000
-stop_times <- replicate(reps, {
-  rolls <- sample(1:6, max_rolls, replace = TRUE, prob = weights)
-  gamma <- cumsum(log_lr(rolls))
-  posterior <- 1 / (1 + exp(-gamma))
-  first_cross <- which(posterior >= 0.95)[1]
-  if (is.na(first_cross)) max_rolls else first_cross
-})
-
-tibble(stop_time = stop_times) %>%
-  ggplot(aes(x = stop_time)) +
-  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
-  labs(
-    x = "Stopping time (roll count)",
-    y = "Frequency",
-    title = "Histogram of stopping times to reach posterior ≥ 0.95"
-  ) +
-  theme_minimal()
-```
-
+rolls_200 <- sample(1:6, 200, replace = TRUE, prob = c(0.14, 0.14, 0.14, 0.14, 0.14, 0.30))
+round(1 / (1 + exp(-sum(log_lr(rolls_200)))), 6)
+#
+#
+#
+#
+#
